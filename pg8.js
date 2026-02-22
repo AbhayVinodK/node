@@ -31,11 +31,12 @@ app.get("/articles", async (req, res) => {
 
 app.listen(3000, () => console.log("Server running"));
 
-//* db
+/* db
 CREATE TABLE articles (
   id SERIAL PRIMARY KEY,
   title TEXT NOT NULL,
   content TEXT NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-*//
+*/
+
