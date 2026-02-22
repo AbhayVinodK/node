@@ -28,4 +28,14 @@ app.get("/articles", async (req, res) => {
   res.json(result.rows);
 });
 
+
 app.listen(3000, () => console.log("Server running"));
+
+//* db
+CREATE TABLE articles (
+  id SERIAL PRIMARY KEY,
+  title TEXT NOT NULL,
+  content TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+*//
