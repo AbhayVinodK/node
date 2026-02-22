@@ -4,28 +4,50 @@ const { Pool } = require("pg");
 const app = express();
 app.use(express.json());
 
-const db = new Pool({ user:"postgres", host:"localhost", database:"art", password:"root", port:5432 });
+const db = new Pool({
+  user: "postgres",
+  host: "localhost",
+  database: "art",
+  password: "root",
+  port: 5432,
+});
 
-app.post("/article", async (req, res) => {
-  const r = await db.query("INSERT INTO articles(title,content) VALUES($1,$2) RETURNING *",
-    [req.body.title, req.body.content]);
+// GET article by ID
+app.get("/articles/:id", async (req, res) => {
+  const r = await db.query("SELECT * FROM articles WHERE id=$1", [req.params.id]);
+  if (!r.rowCount) return res.status(404).send("Article not found");
   res.json(r.rows[0]);
 });
 
-app.get("/articles", async (req, res) => {
-  const r = await db.query("SELECT * FROM articles ORDER BY id");
-  res.json(r.rows);
-});
-
-app.delete("/article/:id", async (req, res) => {
-  const r = await db.query("DELETE FROM articles WHERE id=$1 RETURNING *", [req.params.id]);
-  if (!r.rowCount) return res.status(404).send("Not found");
+// PUT update entire article
+app.put("/article/:id", async (req, res) => {
+  const { title, content } = req.body;
+  const r = await db.query(
+    "UPDATE articles SET title=$1, content=$2 WHERE id=$3 RETURNING *",
+    [title, content, req.params.id]
+  );
+  if (!r.rowCount) return res.status(404).send("Article not found");
   res.json(r.rows[0]);
 });
 
-app.delete("/articles", async (req, res) => {
-  await db.query("DELETE FROM articles");
-  res.send("All deleted");
+// PATCH update partial fields
+app.patch("/article/:id", async (req, res) => {
+  const { title, content } = req.body;
+  const r = await db.query(
+    "UPDATE articles SET title=COALESCE($1,title), content=COALESCE($2,content) WHERE id=$3 RETURNING *",
+    [title, content, req.params.id]
+  );
+  if (!r.rowCount) return res.status(404).send("Article not found");
+  res.json(r.rows[0]);
 });
+
+app.listen(3000, () => console.log("Server running"));
+/* CREATE TABLE articles (
+  id SERIAL PRIMARY KEY,
+  title TEXT NOT NULL,
+  content TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);*/
+
 
 app.listen(3000, () => console.log("Server running"));
