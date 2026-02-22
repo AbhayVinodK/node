@@ -12,14 +12,12 @@ const db = new Pool({
   port: 5432,
 });
 
-// GET article by ID
 app.get("/articles/:id", async (req, res) => {
   const r = await db.query("SELECT * FROM articles WHERE id=$1", [req.params.id]);
   if (!r.rowCount) return res.status(404).send("Article not found");
   res.json(r.rows[0]);
 });
 
-// PUT update entire article
 app.put("/article/:id", async (req, res) => {
   const { title, content } = req.body;
   const r = await db.query(
@@ -30,7 +28,6 @@ app.put("/article/:id", async (req, res) => {
   res.json(r.rows[0]);
 });
 
-// PATCH update partial fields
 app.patch("/article/:id", async (req, res) => {
   const { title, content } = req.body;
   const r = await db.query(
@@ -51,3 +48,4 @@ app.listen(3000, () => console.log("Server running"));
 
 
 app.listen(3000, () => console.log("Server running"));
+
